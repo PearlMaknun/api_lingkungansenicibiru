@@ -45,7 +45,7 @@ $app->get("/lingkunganseni/kelurahan/{id}", function (Request $request, Response
 $app->get("/lingkunganseni/jeniskesenian/", function (Request $request, Response $response, $args){
     $keyword = $request->getQueryParam("keyword");
     //$keyword = $keyword + ";";
-    $sql = "SELECT * FROM tb_lingkunganseni WHERE tag_jeniskesenian LIKE '$keyword%'";
+    $sql = "SELECT * FROM tb_lingkunganseni WHERE tag_jeniskesenian LIKE '%$keyword%'";
     $stmt = $this->db->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetchAll();
@@ -53,11 +53,24 @@ $app->get("/lingkunganseni/jeniskesenian/", function (Request $request, Response
 });
 
 // get lingkunagan seni by kelurahan
+// http://localhost:8080/lingkunganseni/id?key=
 $app->get("/lingkunganseni/{id}", function (Request $request, Response $response, $args){
     $id = $args["id"];
     $sql = "SELECT * FROM tb_lingkunganseni WHERE id_lingkunganseni=:id";
     $stmt = $this->db->prepare($sql);
     $stmt->execute([":id" => $id]);
     $result = $stmt->fetch();
+    return $response->withJson(["status" => "success", "data" => $result], 200);
+});
+
+// search lingkunagan seni by name
+// http://localhost:8080/lingkunganseni/search/?keyword=&key=
+$app->get("/lingkunganseni/search/", function (Request $request, Response $response, $args){
+    $keyword = $request->getQueryParam("keyword");
+    //$keyword = $keyword + ";";
+    $sql = "SELECT * FROM tb_lingkunganseni WHERE nama_lingkunganseni LIKE '%$keyword%'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetchAll();
     return $response->withJson(["status" => "success", "data" => $result], 200);
 });
